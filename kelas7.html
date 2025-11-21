@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz Millionaire - Kelas 7</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: radial-gradient(circle at center, #001f3f, #000);
+      color: #fff;
+      text-align: center;
+      overflow: hidden;
+    }
+    .header {
+      padding: 20px;
+      font-size: 28px;
+      font-weight: bold;
+      color: gold;
+    }
+    .question-box {
+      background: rgba(0,0,0,0.7);
+      border: 2px solid gold;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px auto;
+      width: 80%;
+      font-size: 22px;
+    }
+    .options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin: 20px auto;
+      width: 80%;
+    }
+    .options button {
+      padding: 14px;
+      font-size: 18px;
+      border: 2px solid gold;
+      border-radius: 12px;
+      background-color: #003366;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .options button.correct { background-color: #0077b6; }
+    .options button.wrong { background-color: #cc0000; }
+    .result {
+      margin-top: 20px;
+      font-size: 24px;
+      font-weight: bold;
+      color: gold;
+    }
+    canvas#confetti {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+    }
+    #startBtn {
+      margin-top: 40px;
+      padding: 15px 30px;
+      font-size: 20px;
+      background: gold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">🎓 Quiz Millionaire - Kelas 7</div>
+
+  <!-- Tombol mulai -->
+  <button id="startBtn" onclick="startQuiz()">▶️ Mulai Quiz</button>
+
+  <div class="question-box" id="question"></div>
+  <div class="options" id="options"></div>
+  <div class="result" id="result"></div>
+  <canvas id="confetti"></canvas>
+
+  <!-- Efek suara -->
+  <audio id="correctSound">
+    <source src="https://www.soundjay.com/human/applause-8.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="wrongSound">
+    <source src="https://www.soundjay.com/human/boo-1.mp3" type="audio/mpeg">
+  </audio>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script>
+    // Musik heartbeat via Web Audio API
+    let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let heartbeat = new Audio("https://www.soundjay.com/human/heartbeat-01.mp3");
+    let track = audioCtx.createMediaElementSource(heartbeat);
+    track.connect(audioCtx.destination);
+    heartbeat.loop = true;
+
+    const soal = [
+      {question:"1. Hasil dari 56 ÷ 7 adalah ...", options:["6","7","8","9"], answer:2}, // ✔️ 8
+      {question:"2. Organ yang berfungsi memompa darah adalah ...", options:["Paru-paru","Jantung","Ginjal","Hati"], answer:1}, // ✔️ Jantung
+      {question:"3. Kerajaan Hindu pertama di Indonesia adalah ...", options:["Majapahit","Kutai","Sriwijaya","Mataram"], answer:1}, // ✔️ Kutai
+      {question:"4. Teks yang berisi gambaran objek disebut ...", options:["Narasi","Eksposisi","Deskripsi","Argumentasi"], answer:2}, // ✔️ Deskripsi
+      {question:"5. Sila pertama Pancasila berbunyi ...", options:["Ketuhanan Yang Maha Esa","Persatuan Indonesia","Kemanusiaan yang adil dan beradab","Keadilan sosial"], answer:0}, // ✔️ Ketuhanan YME
+      {question:"6. English: 'Dog' means ...", options:["Kucing","Anjing","Burung","Ikan"], answer:1}, // ✔️ Dog = Anjing
+      {question:"7. 9 × 9 = ...", options:["81","72","99","90"], answer:0}, // ✔️ 81
+      {question:"8. Planet terdekat dengan Matahari adalah ...", options:["Venus","Merkurius","Mars","Bumi"], answer:1}, // ✔️ Merkurius
+      {question:"9. Ibukota Jawa Barat adalah ...", options:["Bogor","Bandung","Bekasi","Cirebon"], answer:1}, // ✔️ Bandung
+      {question:"10. English: 'School' means ...", options:["Sekolah","Rumah","Pasar","Kantor"], answer:0}, // ✔️ School = Sekolah
+      {question:"11. Ekosistem terdiri dari ...", options:["Hewan saja","Tumbuhan saja","Komponen biotik dan abiotik","Air saja"], answer:2}, // ✔️ Biotik & abiotik
+      {question:"12. Kerajaan Islam pertama di Indonesia adalah ...", options:["Demak","Mataram","Sriwijaya","Kutai"], answer:0}, // ✔️ Demak
+      {question:"13. Teks yang berisi langkah-langkah disebut ...", options:["Narasi","Prosedur","Eksposisi","Deskripsi"], answer:1}, // ✔️ Prosedur
+      {question:"14. Norma di sekolah contohnya ...", options:["Membolos","Mengerjakan PR","Berbohong","Berkelahi"], answer:1}, // ✔️ Mengerjakan PR
+      {question:"15. English: 'Teacher' means ...", options:["Guru","Siswa","Petani","Dokter"], answer:0}, // ✔️ Teacher = Guru
+      {question:"16. 7² = ...", options:["42","49","56","63"], answer:1}, // ✔️ 49
+      {question:"17. Fungsi paru-paru adalah ...", options:["Memompa darah","Menyaring darah","Pertukaran oksigen","Menghasilkan energi"], answer:2}, // ✔️ Pertukaran oksigen
+      {question:"18. Kerajaan terbesar Hindu di Jawa adalah ...", options:["Majapahit","Sriwijaya","Kutai","Demak"], answer:0}, // ✔️ Majapahit
+      {question:"19. English: 'Book' means ...", options:["Buku","Meja","Kursi","Papan"], answer:0}, // ✔️ Book = Buku
+      {question:"20. Sila ke-3 Pancasila berbunyi ...", options:["Persatuan Indonesia","Kemanusiaan yang adil","Kerakyatan","Ketuhanan"], answer:0}, // ✔️ Persatuan Indonesia
+      {question:"21. Zat yang dapat kembali ke bentuk semula disebut ...", options:["Perubahan fisika","Perubahan kimia","Campuran","Larutan"], answer:0}, // ✔️ Perubahan fisika
+      {question:"22. Kerajaan Sriwijaya terkenal sebagai ...", options:["Kerajaan maritim","Kerajaan agraris","Kerajaan Islam","Kerajaan Hindu"], answer:0}, // ✔️ Maritim
+      {question:"23. Teks yang berisi pendapat dan alasan disebut ...", options:["Narasi","Argumentasi","Deskripsi","Prosedur"], answer:1}, // ✔️ Argumentasi
+      {question:"24. Hak siswa di sekolah adalah ...", options:["Membolos","Mendapat pelajaran","Berbohong","Merusak fasilitas"], answer:1}, // ✔️ Mendapat pelajaran
+      {question:"25. English: 'Library' means ...", options:["Perpustakaan","Laboratorium","Kantin","Kelas"], answer:0}, // ✔️ Library = Perpustakaan
+      {question:"26. 3x + 5 = 20, nilai x adalah ...", options:["3","5","7","15"], answer:2}, // ✔️ 7
+      {question:"27. Fotosintesis terjadi di ...", options:["Akar","Batang","Daun","Bunga"], answer:2}, // ✔️ Daun
+            {question:"28. Kerajaan Mataram bercorak ...", options:["Islam","Hindu","Budha","Maritim"], answer:1}, // ✔️ Hindu
+      {question:"29. English: 'Beautiful' means ...", options:["Cantik","Buruk","Kotor","Sedih"], answer:0}, // ✔️ Beautiful = Cantik
+      {question:"30. Sila ke-5 Pancasila berbunyi ...", options:["Keadilan sosial bagi seluruh rakyat Indonesia","Persatuan Indonesia","Ketuhanan Yang Maha Esa","Kerakyatan"], answer:0} // ✔️ Keadilan sosial
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    function startQuiz(){
+      // aktifkan musik heartbeat via Web Audio API
+      audioCtx.resume().then(() => {
+        heartbeat.play();
+      });
+      document.getElementById("startBtn").style.display = "none";
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      document.getElementById("question").innerText = soal[currentQuestion].question;
+      document.getElementById("options").innerHTML = soal[currentQuestion].options
+        .map((opt,i)=>`<button onclick="checkAnswer(${i}, this)">${opt}</button>`).join("");
+      document.getElementById("result").innerText = "";
+    }
+
+    function checkAnswer(selected, btn) {
+      const buttons = document.querySelectorAll(".options button");
+      if (selected === soal[currentQuestion].answer) {
+        btn.classList.add("correct");
+        score += 10;
+        document.getElementById("result").innerText = "✅ Benar!";
+        // Efek suara + confetti animasi
+        document.getElementById("correctSound").play();
+        confetti({ particleCount: 200, spread: 90, origin: { y: 0.6 } });
+      } else {
+        btn.classList.add("wrong");
+        document.getElementById("result").innerText = "❌ Salah! Jangan menyerah, tetap semangat!";
+        // Suara boo + tertawa
+        document.getElementById("wrongSound").play();
+      }
+      buttons.forEach(b => b.disabled = true);
+
+      setTimeout(()=>{
+        currentQuestion++;
+        if (currentQuestion < soal.length) {
+          loadQuestion();
+        } else {
+          document.getElementById("question").innerText = "";
+          document.getElementById("options").innerHTML = "";
+          document.getElementById("result").innerText = `🎉 Quiz selesai! Skor kamu: ${score} dari ${soal.length*10}`;
+        }
+      },2500);
+    }
+  </script>
+</body>
+</html>
