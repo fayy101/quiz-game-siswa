@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Game Siswa</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      margin: 0;
+      padding: 0;
+    }
+    .quiz-container {
+      max-width: 700px;
+      margin: 40px auto;
+      background: rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 30px;
+      text-align: center;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+      animation: fadeIn 1s ease-in-out;
+    }
+    h2 {
+      margin-bottom: 15px;
+      font-size: 28px;
+      color: #00ffcc;
+    }
+    .character {
+      width: 120px;
+      margin: 10px auto;
+      border-radius: 50%;
+      box-shadow: 0 0 15px #00ffcc;
+    }
+    select, button {
+      padding: 12px;
+      margin: 10px;
+      border-radius: 10px;
+      border: none;
+      font-size: 16px;
+    }
+    button {
+      background: #00aaff;
+      color: #fff;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover { background: #0077b6; }
+    .options button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      background: #ff9800;
+      font-weight: bold;
+    }
+    .options button:hover { background: #e65100; }
+    .result {
+      font-size: 22px;
+      margin-top: 20px;
+      font-weight: bold;
+      color: #ffd700;
+    }
+    @keyframes fadeIn {
+      from {opacity: 0;}
+      to {opacity: 1;}
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <h2>🎮 Quiz Game Siswa</h2>
+    <!-- Gambar karakter -->
+    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" 
+         alt="Karakter siswa cerdas" class="character">
+
+    <!-- Pilihan Paket -->
+    <div id="paket-selection">
+      <label>Pilih Paket:</label><br>
+      <select id="paket">
+        <option value="B">Paket B (Kelas 7,8,9)</option>
+        <option value="C">Paket C (Kelas 10,11,12)</option>
+      </select><br>
+      <label>Pilih Jurusan:</label><br>
+      <select id="jurusan">
+        <option value="IPA">IPA</option>
+        <option value="IPS">IPS</option>
+      </select><br>
+      <button onclick="startQuiz()">Mulai Quiz 🚀</button>
+    </div>
+
+    <div id="quiz"></div>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    // Bank soal per kategori
+    const soal = {
+      B_IPA: [
+        {question: "Hasil dari 5 x 6 adalah?", options: ["30","25","35","40"], answer: 0},
+        {question: "Planet terdekat dengan Matahari?", options: ["Venus","Merkurius","Mars","Bumi"], answer: 1}
+      ],
+      B_IPS: [
+        {question: "Siapa Bapak Proklamator Indonesia?", options: ["Soekarno","Hatta","Sudirman","Kartini"], answer: 0},
+        {question: "Ibu kota Jawa Barat?", options: ["Bandung","Bogor","Bekasi","Cirebon"], answer: 0}
+      ],
+      C_IPA: [
+        {question: "Rumus kimia air adalah?", options: ["CO2","H2O","O2","NaCl"], answer: 1},
+        {question: "Gaya gravitasi ditemukan oleh?", options: ["Einstein","Newton","Tesla","Galileo"], answer: 1}
+      ],
+      C_IPS: [
+        {question: "Sistem ekonomi Indonesia berdasarkan?", options: ["Kapitalisme","Sosialisme","Pancasila","Komunisme"], answer: 2},
+        {question: "Perang Diponegoro terjadi tahun?", options: ["1825","1908","1945","1965"], answer: 0}
+      ]
+    };
+
+    let currentQuestion = 0;
+    let score = 0;
+    let selectedQuestions = [];
+
+    function startQuiz() {
+      const paket = document.getElementById("paket").value;
+      const jurusan = document.getElementById("jurusan").value;
+      const key = paket + "_" + jurusan;
+      selectedQuestions = soal[key];
+      currentQuestion = 0;
+      score = 0;
+      document.getElementById("paket-selection").style.display = "none";
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      const quiz = document.getElementById("quiz");
+      quiz.innerHTML = `
+        <div class="question">${selectedQuestions[currentQuestion].question}</div>
+        <div class="options">
+          ${selectedQuestions[currentQuestion].options.map((opt,i)=>
+            `<button onclick="checkAnswer(${i})">${opt}</button>`).join("")}
+        </div>
+      `;
+    }
+
+    function checkAnswer(selected) {
+      if (selected === selectedQuestions[currentQuestion].answer) {
+        score += 10;
+      }
+      currentQuestion++;
+      if (currentQuestion < selectedQuestions.length) {
+        loadQuestion();
+      } else {
+        document.getElementById("quiz").innerHTML = "";
+        document.getElementById("result").innerText = 
+          `🎉 Quiz selesai! Skor kamu: ${score}`;
+      }
+    }
+  </script>
+</body>
+</html>
