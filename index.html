@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Game Edukasi Siswa Cerdas</title>
+  <title>Game Edukasi Siswa Cerdas - Paket B</title>
   <style>
     body {
       margin: 0;
@@ -14,15 +14,15 @@
     }
     .header {
       width: 100%;
-      height: 100vh; /* full layar */
+      height: 100vh;
       background: url('https://i.imgur.com/l01ztjR.png') no-repeat center center;
-      background-size: contain; /* supaya seluruh gambar terlihat */
-      background-color: #000;   /* warna latar belakang */
+      background-size: contain; /* seluruh gambar terlihat */
+      background-color: #000;
       position: relative;
     }
     .start-button {
       position: absolute;
-      bottom: 30px; /* tombol di bawah gambar */
+      bottom: 30px;
       left: 50%;
       transform: translateX(-50%);
       padding: 14px 28px;
@@ -37,11 +37,50 @@
     .start-button:hover {
       background-color: #0077b6;
     }
+    .kelas-selection {
+      display: none;
+      position: absolute;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.7);
+      padding: 20px;
+      border-radius: 12px;
+    }
+    .kelas-selection h2 {
+      margin-bottom: 15px;
+    }
+    .kelas-selection button {
+      display: block;
+      margin: 10px auto;
+      padding: 12px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      background-color: #ff8800;
+      color: white;
+      cursor: pointer;
+    }
+    .kelas-selection button:hover {
+      background-color: #cc6600;
+    }
   </style>
 </head>
 <body>
   <div class="header">
-    <button class="start-button" onclick="alert('Mulai Quiz 🚀')">Mulai 🚀</button>
+    <button class="start-button" onclick="showKelas()">Mulai 🚀</button>
+    <div id="kelas-selection" class="kelas-selection">
+      <h2>Pilih Edukasi Paket B</h2>
+      <button onclick="location.href='kelas7.html'">Kelas 7</button>
+      <button onclick="location.href='kelas8.html'">Kelas 8</button>
+      <button onclick="location.href='kelas9.html'">Kelas 9</button>
+    </div>
   </div>
+
+  <script>
+    function showKelas() {
+      document.getElementById("kelas-selection").style.display = "block";
+    }
+  </script>
 </body>
 </html>
